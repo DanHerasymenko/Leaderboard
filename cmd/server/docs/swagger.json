@@ -1,0 +1,334 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server for Leaderboard API.",
+        "title": "Leaderboard API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/auth/singin": {
+            "post": {
+                "description": "SingIn",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "SingIn",
+                "parameters": [
+                    {
+                        "description": "SingIn request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.SingInReqBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SingIn success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "invalid credentials",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/singup": {
+            "post": {
+                "description": "SingUp",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "SingUp",
+                "parameters": [
+                    {
+                        "description": "SingUp request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.SingUpReqBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SingUp success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "409": {
+                        "description": "user already exists",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/counter/increment": {
+            "get": {
+                "description": "Increment counter by 1",
+                "tags": [
+                    "Counter"
+                ],
+                "summary": "Increment counter",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/counter.IncrementResp200Body"
+                        }
+                    }
+                }
+            }
+        },
+        "/score/list": {
+            "post": {
+                "description": "ListScores",
+                "tags": [
+                    "Score"
+                ],
+                "summary": "ListScores",
+                "parameters": [
+                    {
+                        "description": "ListScores request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/score.ListScoresReqBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ListScores success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/score.Score"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/score/submit": {
+            "post": {
+                "description": "SubmitScore",
+                "tags": [
+                    "Score"
+                ],
+                "summary": "SubmitScore",
+                "parameters": [
+                    {
+                        "description": "SubmitScore request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/score.SubmitScoreReqBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SubmitScore success",
+                        "schema": {
+                            "$ref": "#/definitions/score.SubmitScoreResp200Body"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "auth.SingInReqBody": {
+            "type": "object",
+            "required": [
+                "nickName",
+                "password"
+            ],
+            "properties": {
+                "nickName": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 3
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 8
+                }
+            }
+        },
+        "auth.SingUpReqBody": {
+            "type": "object",
+            "required": [
+                "nickName",
+                "password"
+            ],
+            "properties": {
+                "nickName": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 3
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 8
+                }
+            }
+        },
+        "counter.IncrementResp200Body": {
+            "type": "object",
+            "properties": {
+                "counter": {
+                    "type": "integer"
+                }
+            }
+        },
+        "score.Details": {
+            "type": "object",
+            "properties": {
+                "losses": {
+                    "type": "integer"
+                },
+                "playerNickname": {
+                    "type": "string"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "winLoseRatio": {
+                    "type": "string"
+                },
+                "wins": {
+                    "type": "integer"
+                }
+            }
+        },
+        "score.ListScoresReqBody": {
+            "type": "object",
+            "required": [
+                "season"
+            ],
+            "properties": {
+                "season": {
+                    "type": "string"
+                }
+            }
+        },
+        "score.Score": {
+            "type": "object",
+            "properties": {
+                "scoreDetails": {
+                    "$ref": "#/definitions/score.Details"
+                },
+                "scoreID": {
+                    "type": "string"
+                },
+                "scoredAt": {
+                    "type": "string"
+                },
+                "season": {
+                    "type": "string"
+                }
+            }
+        },
+        "score.SubmitScoreReqBody": {
+            "type": "object",
+            "required": [
+                "losses",
+                "nickName",
+                "rating",
+                "region",
+                "wins"
+            ],
+            "properties": {
+                "losses": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "nickName": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 3
+                },
+                "rating": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "region": {
+                    "type": "string",
+                    "enum": [
+                        "EU",
+                        "NA",
+                        "AS",
+                        "SA",
+                        "AF"
+                    ]
+                },
+                "wins": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "score.SubmitScoreResp200Body": {
+            "type": "object",
+            "properties": {
+                "score": {
+                    "$ref": "#/definitions/score.Score"
+                }
+            }
+        }
+    }
+}

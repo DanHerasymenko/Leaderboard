@@ -1,0 +1,24 @@
+services:
+   server:
+     build:
+       context: .
+       target: dev
+       dockerfile: Dockerfile
+     volumes:
+       - ./cmd:/work/cmd
+       - ./internal:/work/internal
+     ports:
+       - "8082:8082"
+     env_file: .env
+
+   mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    command: mongod --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: leaderboard
+#    volumes:
+#      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
