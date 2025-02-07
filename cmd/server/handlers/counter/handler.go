@@ -32,7 +32,7 @@ func NewHandler(cfg *config.Config, clnts *client.Clients, srvs *services.Servic
 // @Description Increment counter by 1
 // @Tags Counter
 // @Success 200 {object} IncrementResp200Body
-// @Router /counter/increment [get]
+// @Router /api/counter/increment [get]
 func (h *Handler) Increment(ctx *fiber.Ctx) error {
 
 	counter, err := h.svsc.Counter.Increment(ctx.Context())

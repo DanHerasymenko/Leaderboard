@@ -36,7 +36,7 @@ type SingUpReqBody struct {
 // @Param body body SingUpReqBody true "SingUp request body"
 // @Success 200 {string} string "SingUp success"
 // @Failure 409 {string} string "user already exists"
-// @Router /auth/singup [post]
+// @Router /api/auth/singup [post]
 func (h *Handler) SingUp(ctx *fiber.Ctx) error {
 
 	reqBody := &SingUpReqBody{}
@@ -72,7 +72,7 @@ type SingInReqBody struct {
 // @Param body body SingInReqBody true "SingIn request body"
 // @Success 200 {string} string "SingIn success"
 // @Failure 401 {string} string "invalid credentials"
-// @Router /auth/singin [post]
+// @Router /api/auth/singin [post]
 func (h *Handler) SingIn(ctx *fiber.Ctx) error {
 
 	reqBody := &SingUpReqBody{}

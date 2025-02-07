@@ -6,6 +6,7 @@ package main
 
 import (
 	"Leaderboard/cmd/server/handlers"
+	"Leaderboard/cmd/server/handlers/middlewares"
 	"Leaderboard/internal/client"
 	"Leaderboard/internal/config"
 	"Leaderboard/internal/logger"
@@ -34,9 +35,11 @@ func main() {
 
 	svcs := services.NewServices(cfg, clnts)
 
+	mdlwrs := middlewares.NewMiddleware(cfg, clnts, svcs)
+
 	app := fiber.New()
 
-	hdlrs := handlers.NewHandlers(cfg, clnts, svcs)
+	hdlrs := handlers.NewHandlers(cfg, clnts, svcs, mdlwrs)
 	hdlrs.RegisterRoutes(app)
 
 	go func() {

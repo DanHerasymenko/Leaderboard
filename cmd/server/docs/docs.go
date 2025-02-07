@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/singin": {
+        "/api/auth/singin": {
             "post": {
                 "description": "SingIn",
                 "tags": [
@@ -49,7 +49,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/singup": {
+        "/api/auth/singup": {
             "post": {
                 "description": "SingUp",
                 "tags": [
@@ -83,7 +83,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/counter/increment": {
+        "/api/counter/increment": {
             "get": {
                 "description": "Increment counter by 1",
                 "tags": [
@@ -100,7 +100,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/score/list": {
+        "/api/score/list": {
             "post": {
                 "description": "ListScores",
                 "tags": [
@@ -143,7 +143,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/score/submit": {
+        "/api/score/submit": {
             "post": {
                 "description": "SubmitScore",
                 "tags": [
@@ -269,6 +269,9 @@ const docTemplate = `{
                 "season"
             ],
             "properties": {
+                "last_received_id": {
+                    "type": "string"
+                },
                 "season": {
                     "type": "string"
                 }

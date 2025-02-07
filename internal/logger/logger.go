@@ -17,8 +17,7 @@ func getArgs(args []slog.Attr) []any {
 // Init initializes the logger before main
 func init() {
 	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level:     slog.LevelInfo,
-		AddSource: true,
+		Level: slog.LevelInfo,
 	})
 	l := slog.New(h)
 	slog.SetDefault(l)

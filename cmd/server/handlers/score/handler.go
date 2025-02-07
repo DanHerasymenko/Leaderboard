@@ -46,7 +46,7 @@ type SubmitScoreResp200Body struct {
 // @Failure 400 {string} string "bad request"
 // @Failure 401 {string} string "unauthorized"
 // @Failure 500 {string} string "internal server error"
-// @Router /score/submit [post]
+// @Router /api/score/submit [post]
 func (h *Handler) SubmitScore(ctx *fiber.Ctx) error {
 
 	reqBody := &SubmitScoreReqBody{}
@@ -85,7 +85,7 @@ type ListScoresResp200Body struct {
 // @Success 200 {array} Score "ListScores success"
 // @Failure 400 {string} string "bad request"
 // @Failure 500 {string} string "internal server error"
-// @Router /score/list [post]
+// @Router /api/score/list [post]
 func (h *Handler) ListScores(ctx *fiber.Ctx) error {
 
 	reqBody := &ListScoresReqBody{}

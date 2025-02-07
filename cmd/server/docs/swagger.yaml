@@ -51,6 +51,8 @@ definitions:
     type: object
   score.ListScoresReqBody:
     properties:
+      last_received_id:
+        type: string
       season:
         type: string
     required:
@@ -108,7 +110,7 @@ info:
   title: Leaderboard API
   version: "1.0"
 paths:
-  /auth/singin:
+  /api/auth/singin:
     post:
       description: SingIn
       parameters:
@@ -130,7 +132,7 @@ paths:
       summary: SingIn
       tags:
       - Auth
-  /auth/singup:
+  /api/auth/singup:
     post:
       description: SingUp
       parameters:
@@ -152,7 +154,7 @@ paths:
       summary: SingUp
       tags:
       - Auth
-  /counter/increment:
+  /api/counter/increment:
     get:
       description: Increment counter by 1
       responses:
@@ -163,7 +165,7 @@ paths:
       summary: Increment counter
       tags:
       - Counter
-  /score/list:
+  /api/score/list:
     post:
       description: ListScores
       parameters:
@@ -191,7 +193,7 @@ paths:
       summary: ListScores
       tags:
       - Score
-  /score/submit:
+  /api/score/submit:
     post:
       description: SubmitScore
       parameters:
