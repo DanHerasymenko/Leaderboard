@@ -44,13 +44,13 @@ func init() {
 }
 
 func Info(ctx context.Context, msg string, attrs ...slog.Attr) {
-	args := getArgs(attrs)
+	args := getArgs(mergeAttrs(ctx, attrs))
 	slog.Default().InfoContext(ctx, msg, args...)
 
 }
 
 func Error(ctx context.Context, err error, attrs ...slog.Attr) {
-	args := getArgs(attrs)
+	args := getArgs(mergeAttrs(ctx, attrs))
 	slog.Default().ErrorContext(ctx, err.Error(), args...)
 
 }

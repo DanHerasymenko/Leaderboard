@@ -1,4 +1,4 @@
-package utils
+package req_parser
 
 import (
 	"fmt"

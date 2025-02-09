@@ -1,7 +1,7 @@
 package auth
 
 import (
-	rpu "Leaderboard/cmd/server/utils"
+	rpu "Leaderboard/cmd/server/utils/req_parser"
 	"Leaderboard/internal/client"
 	"Leaderboard/internal/config"
 	"Leaderboard/internal/services"
