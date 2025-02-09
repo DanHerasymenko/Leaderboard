@@ -47,6 +47,7 @@ type SubmitScoreResp200Body struct {
 // @Failure 401 {string} string "unauthorized"
 // @Failure 500 {string} string "internal server error"
 // @Router /api/score/submit [post]
+// @Security UserTokenAuth
 func (h *Handler) SubmitScore(ctx *fiber.Ctx) error {
 
 	reqBody := &SubmitScoreReqBody{}
@@ -86,6 +87,7 @@ type ListScoresResp200Body struct {
 // @Failure 400 {string} string "bad request"
 // @Failure 500 {string} string "internal server error"
 // @Router /api/score/list [post]
+// @Security UserTokenAuth
 func (h *Handler) ListScores(ctx *fiber.Ctx) error {
 
 	reqBody := &ListScoresReqBody{}

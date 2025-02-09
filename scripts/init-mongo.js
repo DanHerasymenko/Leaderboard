@@ -4,15 +4,15 @@ db.createCollection('users');
 db.users.createIndex({"id": 1 }, {
     unique: true,
 });
-db.users.createIndex({"name": 1 }, {
+db.users.createIndex({"nickname": 1 }, {
     unique: true,
 });
 
 db.createCollection('scores');
-db.messages.createIndex({"id": 1 }, {
+db.scores.createIndex({"scoreID": 1 }, {
     unique: true,
 });
-db.messages.createIndex({
-    "channel_name": -1,
-    "id": -1
-})
+db.scores.createIndex({
+    "season": -1,
+    "scoreDetails.rating": -1
+});

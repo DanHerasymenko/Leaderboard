@@ -37,7 +37,7 @@ const docTemplate = `{
                     "200": {
                         "description": "SingIn success",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.SingInResp200Body"
                         }
                     },
                     "401": {
@@ -102,6 +102,11 @@ const docTemplate = `{
         },
         "/api/score/list": {
             "post": {
+                "security": [
+                    {
+                        "UserTokenAuth": []
+                    }
+                ],
                 "description": "ListScores",
                 "tags": [
                     "Score"
@@ -145,6 +150,11 @@ const docTemplate = `{
         },
         "/api/score/submit": {
             "post": {
+                "security": [
+                    {
+                        "UserTokenAuth": []
+                    }
+                ],
                 "description": "SubmitScore",
                 "tags": [
                     "Score"
@@ -207,6 +217,14 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 32,
                     "minLength": 8
+                }
+            }
+        },
+        "auth.SingInResp200Body": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
                 }
             }
         },
@@ -340,6 +358,13 @@ const docTemplate = `{
                     "$ref": "#/definitions/score.Score"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "UserTokenAuth": {
+            "type": "apiKey",
+            "name": "X-User-Token",
+            "in": "header"
         }
     }
 }`

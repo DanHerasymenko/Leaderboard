@@ -50,6 +50,7 @@ func (h *Handlers) RegisterRoutes(router fiber.Router) {
 	ag.Post("/singin", h.Auth.SingIn)
 
 	sg := api.Group("/score")
+	sg.Use(h.mdlwrs.Auth.Handle)
 	sg.Post("/submit", h.Score.SubmitScore)
 	sg.Post("/list", h.Score.ListScores)
 

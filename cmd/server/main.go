@@ -2,6 +2,10 @@
 // @version 1.0
 // @description This is a sample server for Leaderboard API.
 
+// @securityDefinitions.apiKey UserTokenAuth
+// @in header
+// @name X-User-Token
+
 package main
 
 import (

@@ -13,6 +13,11 @@ definitions:
     - nickName
     - password
     type: object
+  auth.SingInResp200Body:
+    properties:
+      token:
+        type: string
+    type: object
   auth.SingUpReqBody:
     properties:
       nickName:
@@ -124,7 +129,7 @@ paths:
         "200":
           description: SingIn success
           schema:
-            type: string
+            $ref: '#/definitions/auth.SingInResp200Body'
         "401":
           description: invalid credentials
           schema:
@@ -190,6 +195,8 @@ paths:
           description: internal server error
           schema:
             type: string
+      security:
+      - UserTokenAuth: []
       summary: ListScores
       tags:
       - Score
@@ -220,7 +227,14 @@ paths:
           description: internal server error
           schema:
             type: string
+      security:
+      - UserTokenAuth: []
       summary: SubmitScore
       tags:
       - Score
+securityDefinitions:
+  UserTokenAuth:
+    in: header
+    name: X-User-Token
+    type: apiKey
 swagger: "2.0"

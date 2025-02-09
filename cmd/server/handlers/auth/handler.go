@@ -66,11 +66,15 @@ type SingInReqBody struct {
 	Password string `json:"password" validate:"required,min=8,max=32"`
 }
 
+type SingInResp200Body struct {
+	Token string `json:"token"`
+}
+
 // @Summary SingIn
 // @Description SingIn
 // @Tags Auth
 // @Param body body SingInReqBody true "SingIn request body"
-// @Success 200 {string} string "SingIn success"
+// @Success 200 {object} SingInResp200Body "SingIn success"
 // @Failure 401 {string} string "invalid credentials"
 // @Router /api/auth/singin [post]
 func (h *Handler) SingIn(ctx *fiber.Ctx) error {
@@ -97,5 +101,10 @@ func (h *Handler) SingIn(ctx *fiber.Ctx) error {
 		return fiber.ErrUnauthorized
 	}
 
-	return ctx.JSON(user)
+	token, err := h.svsc.Auth.CreateAuthToken(user.ID)
+	if err != nil {
+		return fmt.Errorf("failed to create auth token: %w", err)
+	}
+
+	return ctx.JSON(&SingInResp200Body{Token: *token})
 }
