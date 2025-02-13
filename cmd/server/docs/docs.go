@@ -83,23 +83,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/counter/increment": {
-            "get": {
-                "description": "Increment counter by 1",
-                "tags": [
-                    "Counter"
-                ],
-                "summary": "Increment counter",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/counter.IncrementResp200Body"
-                        }
-                    }
-                }
-            }
-        },
         "/api/score/list": {
             "post": {
                 "security": [
@@ -244,14 +227,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 32,
                     "minLength": 8
-                }
-            }
-        },
-        "counter.IncrementResp200Body": {
-            "type": "object",
-            "properties": {
-                "counter": {
-                    "type": "integer"
                 }
             }
         },

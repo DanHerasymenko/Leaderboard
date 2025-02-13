@@ -32,11 +32,6 @@ definitions:
     - nickName
     - password
     type: object
-  counter.IncrementResp200Body:
-    properties:
-      counter:
-        type: integer
-    type: object
   score.Details:
     properties:
       losses:
@@ -159,17 +154,6 @@ paths:
       summary: SingUp
       tags:
       - Auth
-  /api/counter/increment:
-    get:
-      description: Increment counter by 1
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/counter.IncrementResp200Body'
-      summary: Increment counter
-      tags:
-      - Counter
   /api/score/list:
     post:
       description: ListScores

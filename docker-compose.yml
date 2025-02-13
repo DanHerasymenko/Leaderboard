@@ -7,6 +7,8 @@ services:
      volumes:
        - ./cmd:/work/cmd
        - ./internal:/work/internal
+       - ./web:/work/web
+       - ./scripts:/work/scripts
      ports:
        - "8082:8082"
      env_file: .env

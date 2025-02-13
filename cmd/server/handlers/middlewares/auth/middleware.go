@@ -3,9 +3,10 @@ package auth
 import (
 	"Leaderboard/internal/client"
 	"Leaderboard/internal/config"
-	"Leaderboard/internal/logger"
 	"Leaderboard/internal/services"
+	as "Leaderboard/internal/services/auth"
 	"errors"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"log/slog"
 
@@ -53,14 +54,22 @@ func (m *Middleware) Handle(ctx *fiber.Ctx) error {
 	return ctx.Next()
 }
 
-func MustGetUserID(ctx *fiber.Ctx) string {
+func mustBeUser(v any) *as.User {
+	if user, ok := v.(*as.User); ok {
+		return user
+	}
+	panic(ErrUserIdExpected)
+}
+
+func MustGetUser(ctx *fiber.Ctx) *as.User {
 	val := ctx.Locals(ctxKey)
 
-	if uid, ok := val.(string); ok {
-		return uid
-	}
+	return mustBeUser(val)
 
-	logger.Panic(ctx.Context(), ErrUserIdExpected)
-	return ""
+}
 
+func MustGetUserWs(conn *websocket.Conn) *as.User {
+	val := conn.Locals(ctxKey)
+
+	return mustBeUser(val)
 }

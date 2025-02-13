@@ -1,11 +1,13 @@
 package score
 
 import (
+	am "Leaderboard/cmd/server/handlers/middlewares/auth"
 	rpu "Leaderboard/cmd/server/utils/req_parser"
 	"Leaderboard/internal/client"
 	"Leaderboard/internal/config"
 	"Leaderboard/internal/services"
 	ss "Leaderboard/internal/services/score"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"regexp"
 )
@@ -50,13 +52,14 @@ type SubmitScoreResp200Body struct {
 // @Security UserTokenAuth
 func (h *Handler) SubmitScore(ctx *fiber.Ctx) error {
 
-	reqBody := &SubmitScoreReqBody{}
+	u := am.MustGetUser(ctx)
 
+	reqBody := &SubmitScoreReqBody{}
 	if err := rpu.ParseReqBody(ctx, reqBody); err != nil {
 		return fiber.ErrBadRequest
 	}
 
-	_, err := h.svsc.Auth.GetUserByName(ctx.Context(), reqBody.NickName)
+	_, err := h.svsc.Auth.GetUserByName(ctx.Context(), u.Nickname)
 	if err != nil {
 		return fiber.ErrUnauthorized
 	}
@@ -110,4 +113,7 @@ func (h *Handler) ListScores(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(ListScoresResp200Body{Scores: scoreList})
+}
+
+func (h *Handler) ListenScores(conn *websocket.Conn) {
 }
