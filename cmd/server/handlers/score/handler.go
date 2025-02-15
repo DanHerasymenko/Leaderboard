@@ -59,12 +59,12 @@ func (h *Handler) SubmitScore(ctx *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	_, err := h.svsc.Auth.GetUserByName(ctx.Context(), u.Nickname)
+	u, err := h.svsc.Auth.GetUserByName(ctx.Context(), u.Nickname)
 	if err != nil {
 		return fiber.ErrUnauthorized
 	}
 
-	score, err := h.svsc.Score.AddNewScore(ctx.Context(), reqBody.Rating, reqBody.NickName, reqBody.Wins, reqBody.Losses, reqBody.Region)
+	score, err := h.svsc.Score.AddNewScore(ctx.Context(), reqBody.Rating, u.Nickname, reqBody.Wins, reqBody.Losses, reqBody.Region)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}

@@ -21,9 +21,6 @@
 go.work
 go.mod
 
-#config
-config/
-
 #IDE dir
 .idea/
 

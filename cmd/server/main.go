@@ -47,7 +47,7 @@ func main() {
 	hdlrs.RegisterRoutes(app)
 
 	go func() {
-		err = app.Listen(":8082")
+		err = app.Listen(cfg.ServerAddr)
 		if err != nil {
 			logger.Panic(ctx, fmt.Errorf("failed to start server: %w", err))
 		}
