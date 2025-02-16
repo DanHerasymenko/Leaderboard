@@ -1,15 +1,18 @@
 package score
 
 import (
-	am "Leaderboard/cmd/server/handlers/middlewares/auth"
 	rpu "Leaderboard/cmd/server/utils/req_parser"
 	"Leaderboard/internal/client"
 	"Leaderboard/internal/config"
 	"Leaderboard/internal/services"
+	as "Leaderboard/internal/services/auth"
 	ss "Leaderboard/internal/services/score"
+	"Leaderboard/internal/utils"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"regexp"
+
+	am "Leaderboard/cmd/server/handlers/middlewares/auth"
 )
 
 var seasonRegex = regexp.MustCompile(`^(Winter|Spring|Summer|Autumn)[0-9]{4}$`)
@@ -29,11 +32,11 @@ func NewHandler(cfg *config.Config, clnts *client.Clients, srvs *services.Servic
 }
 
 type SubmitScoreReqBody struct {
-	NickName string `json:"nickName" validate:"required,min=3,max=32,alphanum"`
-	Rating   int    `json:"rating" validate:"required,min=1"`
-	Wins     int    `json:"wins" validate:"required,min=0"`
-	Losses   int    `json:"losses" validate:"required,min=0"`
-	Region   string `json:"region" validate:"required,oneof=EU NA AS SA AF"`
+	//NickName string `json:"nickName" validate:"required,min=3,max=32,alphanum"`
+	Rating int    `json:"rating" validate:"required,min=1"`
+	Wins   int    `json:"wins" validate:"required,min=0"`
+	Losses int    `json:"losses" validate:"required,min=0"`
+	Region string `json:"region" validate:"required,oneof=EU NA AS SA AF"`
 }
 
 type SubmitScoreResp200Body struct {
@@ -41,7 +44,7 @@ type SubmitScoreResp200Body struct {
 }
 
 // @Summary SubmitScore
-// @Description SubmitScore
+// @Description Create or updates if exists the player’s score
 // @Tags Score
 // @Param body body SubmitScoreReqBody true "SubmitScore request body"
 // @Success 200 {object} SubmitScoreResp200Body "SubmitScore success"
@@ -52,14 +55,17 @@ type SubmitScoreResp200Body struct {
 // @Security UserTokenAuth
 func (h *Handler) SubmitScore(ctx *fiber.Ctx) error {
 
-	u := am.MustGetUser(ctx)
+	err, userID := am.MustGetUserID(ctx)
+	if err != nil {
+		return fiber.ErrUnauthorized
+	}
 
 	reqBody := &SubmitScoreReqBody{}
 	if err := rpu.ParseReqBody(ctx, reqBody); err != nil {
 		return fiber.ErrBadRequest
 	}
 
-	u, err := h.svsc.Auth.GetUserByName(ctx.Context(), u.Nickname)
+	u, err := h.svsc.Auth.GetUserByParam(ctx.Context(), &as.UserSearchParameters{ID: &userID})
 	if err != nil {
 		return fiber.ErrUnauthorized
 	}
@@ -83,14 +89,13 @@ type ListScoresResp200Body struct {
 }
 
 // @Summary ListScores
-// @Description ListScores
+// @Description Get list of scores based on season
 // @Tags Score
 // @Param body body ListScoresReqBody true "ListScores request body"
 // @Success 200 {array} Score "ListScores success"
 // @Failure 400 {string} string "bad request"
 // @Failure 500 {string} string "internal server error"
 // @Router /api/score/list [post]
-// @Security UserTokenAuth
 func (h *Handler) ListScores(ctx *fiber.Ctx) error {
 
 	reqBody := &ListScoresReqBody{}
@@ -105,7 +110,7 @@ func (h *Handler) ListScores(ctx *fiber.Ctx) error {
 
 	scoreList, err := h.svsc.Score.ListScores(ctx.Context(), ss.ListScoresParams{
 		Season:              reqBody.Season,
-		Limit:               2,
+		Limit:               30,
 		LastReceivedScoreID: reqBody.LastReceivedId,
 	})
 	if err != nil {
@@ -113,6 +118,57 @@ func (h *Handler) ListScores(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(ListScoresResp200Body{Scores: scoreList})
+}
+
+// @Summary TopScores
+// @Description Retrieves the top players based on their ranking
+// @Tags Score
+// @Param limit query int false "limit"
+// @Default limit 3
+// @Param season query string false "season"
+// @Default season current season
+// @Success 200 {array} Score "TopScores success"
+// @Failure 500 {string} string "internal server error"
+// @Router /api/score/top [get]
+func (h *Handler) GetTopScores(ctx *fiber.Ctx) error {
+	limit := ctx.QueryInt("limit", 3)
+	int64Limit := int64(limit)
+
+	_, currentSeason := utils.GetCurrentSeasonAndTime()
+
+	reqSeason := ctx.Query("season", currentSeason)
+
+	if !seasonRegex.MatchString(reqSeason) {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid season format (expected e.g. 'Winter2025')")
+	}
+
+	scoreList, err := h.svsc.Score.ListScores(ctx.Context(), ss.ListScoresParams{
+		Season: reqSeason,
+		Limit:  int64Limit,
+	})
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.JSON(ListScoresResp200Body{Scores: scoreList})
+
+}
+
+// @Summary DeleteAllScores
+// @Description Deletes the entire leaderboard (for admin use).
+// @Tags Score
+// @Success 200 {string} string "DeleteAllScores success"
+// @Failure 500 {string} string "internal server error"
+// @Router /api/score/delete [delete]
+// @Security UserTokenAuth
+func (h *Handler) DeleteAllScores(ctx *fiber.Ctx) error {
+
+	err := h.svsc.Score.DeleteAllScores(ctx.Context())
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.JSON("DeleteAllScores success")
 }
 
 func (h *Handler) ListenScores(conn *websocket.Conn) {

@@ -4,6 +4,7 @@ import (
 	"Leaderboard/internal/client"
 	"Leaderboard/internal/config"
 	"Leaderboard/internal/constants"
+	"Leaderboard/internal/logger"
 	"Leaderboard/internal/utils"
 	"context"
 	"fmt"
@@ -105,7 +106,9 @@ func (s *Service) ListScores(ctx context.Context, params ListScoresParams) ([]Sc
 		filter["scoreID"] = bson.M{"$lt": *params.LastReceivedScoreID}
 	}
 
-	opts := options.Find().SetLimit(params.Limit)
+	opts := options.Find().
+		SetSort(bson.D{{"ranking", -1}}).
+		SetLimit(params.Limit)
 
 	cur, err := s.scoresColl.Find(ctx, filter, opts)
 
@@ -122,4 +125,15 @@ func (s *Service) ListScores(ctx context.Context, params ListScoresParams) ([]Sc
 
 	return res, nil
 
+}
+
+func (s *Service) DeleteAllScores(ctx context.Context) error {
+
+	_, err := s.scoresColl.DeleteMany(ctx, bson.M{})
+	if err != nil {
+		logger.Error(ctx, fmt.Errorf("failed to delete all scores: %w", err))
+		return err
+	}
+
+	return nil
 }

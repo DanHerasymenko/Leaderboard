@@ -85,7 +85,7 @@ func (h *Handler) SingIn(ctx *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	user, err := h.svsc.Auth.GetUserByName(ctx.Context(), reqBody.NickName)
+	user, err := h.svsc.Auth.GetUserByParam(ctx.Context(), &as.UserSearchParameters{Nickname: &reqBody.NickName})
 	if errors.Is(err, as.ErrUserNotFound) {
 		return fiber.ErrUnauthorized
 	} else if err != nil {

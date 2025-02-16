@@ -83,14 +83,37 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/score/list": {
-            "post": {
+        "/api/score/delete": {
+            "delete": {
                 "security": [
                     {
                         "UserTokenAuth": []
                     }
                 ],
-                "description": "ListScores",
+                "description": "Deletes the entire leaderboard (for admin use).",
+                "tags": [
+                    "Score"
+                ],
+                "summary": "DeleteAllScores",
+                "responses": {
+                    "200": {
+                        "description": "DeleteAllScores success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/score/list": {
+            "post": {
+                "description": "Get list of scores based on season",
                 "tags": [
                     "Score"
                 ],
@@ -138,7 +161,7 @@ const docTemplate = `{
                         "UserTokenAuth": []
                     }
                 ],
-                "description": "SubmitScore",
+                "description": "Create or updates if exists the player’s score",
                 "tags": [
                     "Score"
                 ],
@@ -171,6 +194,46 @@ const docTemplate = `{
                         "description": "unauthorized",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/score/top": {
+            "get": {
+                "description": "Retrieves the top players based on their ranking",
+                "tags": [
+                    "Score"
+                ],
+                "summary": "TopScores",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "season",
+                        "name": "season",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "TopScores success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/score.Score"
+                            }
                         }
                     },
                     "500": {
@@ -291,7 +354,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "losses",
-                "nickName",
                 "rating",
                 "region",
                 "wins"
@@ -301,12 +363,8 @@ const docTemplate = `{
                     "type": "integer",
                     "minimum": 0
                 },
-                "nickName": {
-                    "type": "string",
-                    "maxLength": 32,
-                    "minLength": 3
-                },
                 "rating": {
+                    "description": "NickName string ` + "`" + `json:\"nickName\" validate:\"required,min=3,max=32,alphanum\"` + "`" + `",
                     "type": "integer",
                     "minimum": 1
                 },

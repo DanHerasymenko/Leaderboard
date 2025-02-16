@@ -1,16 +1,14 @@
 package auth
 
 import (
+	fu "Leaderboard/cmd/server/utils/fiber"
 	"Leaderboard/internal/client"
 	"Leaderboard/internal/config"
+	"Leaderboard/internal/constants"
 	"Leaderboard/internal/services"
-	as "Leaderboard/internal/services/auth"
 	"errors"
-	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"log/slog"
-
-	fu "Leaderboard/cmd/server/utils/fiber"
 )
 
 type Middleware struct {
@@ -29,7 +27,8 @@ func NewMiddleware(cfg *config.Config, clnts *client.Clients, svcs *services.Ser
 
 const (
 	authHeaderName = "X-User-Token"
-	ctxKey         = "user_id"
+	ctxUserKey     = "user_id"
+	ctxRoleKey     = "role"
 )
 
 var ErrUserIdExpected = errors.New("user id expected")
@@ -47,29 +46,47 @@ func (m *Middleware) Handle(ctx *fiber.Ctx) error {
 		return fiber.ErrUnauthorized
 	}
 
-	ctx.Locals(ctxKey, *userID)
+	role, err := m.svcs.Auth.GetUserRole(ctx.Context(), userID)
+	if err != nil {
+		return fiber.ErrUnauthorized
+	}
 
-	fu.SetLoggerAttr(ctx, slog.String(ctxKey, *userID))
+	ctx.Locals(ctxUserKey, *userID)
+	ctx.Locals(ctxRoleKey, role)
+
+	fu.SetLoggerAttr(ctx, slog.String(ctxUserKey, *userID), slog.String(ctxRoleKey, role))
 
 	return ctx.Next()
 }
 
-func mustBeUser(v any) *as.User {
-	if user, ok := v.(*as.User); ok {
-		return user
+func (m *Middleware) HandleIsAdmin(ctx *fiber.Ctx) error {
+	userRole, ok := ctx.Locals("role").(string)
+	if !ok || userRole != constants.AdminRole {
+		return fiber.ErrForbidden
+	}
+	return ctx.Next()
+}
+
+func mustBeUserID(v any) string {
+	if uid, ok := v.(string); ok {
+		return uid
 	}
 	panic(ErrUserIdExpected)
 }
 
-func MustGetUser(ctx *fiber.Ctx) *as.User {
-	val := ctx.Locals(ctxKey)
+func MustGetUserID(ctx *fiber.Ctx) (error, string) {
+	val := ctx.Locals(ctxUserKey)
 
-	return mustBeUser(val)
+	if val == nil {
+		return fiber.ErrUnauthorized, ""
+	}
+
+	return nil, mustBeUserID(val)
 
 }
 
-func MustGetUserWs(conn *websocket.Conn) *as.User {
-	val := conn.Locals(ctxKey)
-
-	return mustBeUser(val)
-}
+//func MustGetUserWs(conn *websocket.Conn) *as.User {
+//	val := conn.Locals(ctxKey)
+//
+//	return mustBeUser(val)
+//}

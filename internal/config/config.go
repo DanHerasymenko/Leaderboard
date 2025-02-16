@@ -10,7 +10,7 @@ type Config struct {
 	MongoURI    string `env:"MONGO_URI"`
 	MongoDbName string `env:"MONGO_DB_NAME"`
 	AuthSecret  string `env:"AUTH_SECRET"`
-	ServerAddr  string `env:"SERVER_ADDR" envDefault:":8080"`
+	ServerPort  string `env:"SERVER_ADDR" envDefault:":8082"`
 }
 
 func NewConfigFromEnv() (*Config, error) {

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"Leaderboard/internal/constants"
 	"context"
 	"errors"
 	"fmt"
@@ -19,7 +20,13 @@ type User struct {
 	ID           string    `json:"id" bson:"id"`
 	Nickname     string    `json:"nickname" bson:"nickname"`
 	PasswordHash string    `json:"password_hash" bson:"password_hash"`
+	Role         string    `json:"role" bson:"role"`
 	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
+}
+
+type UserSearchParameters struct {
+	ID       *string
+	Nickname *string
 }
 
 func (s *Service) CreateUser(ctx context.Context, nickname, password string) (*User, error) {
@@ -30,6 +37,7 @@ func (s *Service) CreateUser(ctx context.Context, nickname, password string) (*U
 		ID:           ulid.MustNew(ulid.Timestamp(now), ulid.DefaultEntropy()).String(),
 		Nickname:     nickname,
 		PasswordHash: password,
+		Role:         constants.UserRole,
 		CreatedAt:    now,
 	}
 
@@ -44,9 +52,18 @@ func (s *Service) CreateUser(ctx context.Context, nickname, password string) (*U
 
 }
 
-func (s *Service) GetUserByName(ctx context.Context, nickname string) (*User, error) {
+func (s *Service) GetUserByParam(ctx context.Context, param *UserSearchParameters) (*User, error) {
 
-	filter := bson.M{"nickname": nickname}
+	filter := bson.M{}
+
+	switch {
+	case param.ID != nil:
+		filter = bson.M{"id": *param.ID}
+	case param.Nickname != nil:
+		filter = bson.M{"nickname": *param.Nickname}
+	default:
+		return nil, errors.New("ID or Nickname must be provided")
+	}
 
 	res := s.usersColl.FindOne(ctx, filter)
 	if errors.Is(res.Err(), mongo.ErrNoDocuments) {
@@ -63,5 +80,14 @@ func (s *Service) GetUserByName(ctx context.Context, nickname string) (*User, er
 	}
 
 	return u, nil
+
+}
+
+func (s *Service) GetUserRole(ctx context.Context, userId *string) (string, error) {
+	user, err := s.GetUserByParam(ctx, &UserSearchParameters{ID: userId})
+	if err != nil {
+		return "", err
+	}
+	return user.Role, nil
 
 }

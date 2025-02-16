@@ -74,11 +74,8 @@ definitions:
       losses:
         minimum: 0
         type: integer
-      nickName:
-        maxLength: 32
-        minLength: 3
-        type: string
       rating:
+        description: NickName string `json:"nickName" validate:"required,min=3,max=32,alphanum"`
         minimum: 1
         type: integer
       region:
@@ -94,7 +91,6 @@ definitions:
         type: integer
     required:
     - losses
-    - nickName
     - rating
     - region
     - wins
@@ -154,9 +150,26 @@ paths:
       summary: SingUp
       tags:
       - Auth
+  /api/score/delete:
+    delete:
+      description: Deletes the entire leaderboard (for admin use).
+      responses:
+        "200":
+          description: DeleteAllScores success
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      security:
+      - UserTokenAuth: []
+      summary: DeleteAllScores
+      tags:
+      - Score
   /api/score/list:
     post:
-      description: ListScores
+      description: Get list of scores based on season
       parameters:
       - description: ListScores request body
         in: body
@@ -179,14 +192,12 @@ paths:
           description: internal server error
           schema:
             type: string
-      security:
-      - UserTokenAuth: []
       summary: ListScores
       tags:
       - Score
   /api/score/submit:
     post:
-      description: SubmitScore
+      description: Create or updates if exists the player’s score
       parameters:
       - description: SubmitScore request body
         in: body
@@ -214,6 +225,32 @@ paths:
       security:
       - UserTokenAuth: []
       summary: SubmitScore
+      tags:
+      - Score
+  /api/score/top:
+    get:
+      description: Retrieves the top players based on their ranking
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: season
+        in: query
+        name: season
+        type: string
+      responses:
+        "200":
+          description: TopScores success
+          schema:
+            items:
+              $ref: '#/definitions/score.Score'
+            type: array
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: TopScores
       tags:
       - Score
 securityDefinitions:

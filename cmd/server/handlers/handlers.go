@@ -47,9 +47,12 @@ func (h *Handlers) RegisterRoutes(router fiber.Router) {
 	ag.Post("/singin", h.Auth.SingIn)
 
 	sg := api.Group("/score")
-	sg.Use(h.mdlwrs.Auth.Handle)
-	sg.Post("/submit", h.Score.SubmitScore)
+	sg.Post("/submit", h.mdlwrs.Auth.Handle, h.Score.SubmitScore)
 	sg.Post("/list", h.Score.ListScores)
+	sg.Get("/top", h.Score.GetTopScores)
+	sg.Delete("/delete", h.mdlwrs.Auth.Handle, h.mdlwrs.Auth.HandleIsAdmin, h.Score.DeleteAllScores)
+
+	//Websocket
 	sg.Get("/listen", websocket.New(h.Score.ListenScores))
 
 	//Web pages
