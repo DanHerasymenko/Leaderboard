@@ -195,6 +195,17 @@ paths:
       summary: ListScores
       tags:
       - Score
+  /api/score/listen_list:
+    get:
+      description: Listen to the score list updates
+      responses:
+        "200":
+          description: ListenScores success
+          schema:
+            type: string
+      summary: ListenScores
+      tags:
+      - Score
   /api/score/submit:
     post:
       description: Create or updates if exists the player’s score

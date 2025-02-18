@@ -53,7 +53,7 @@ func (h *Handlers) RegisterRoutes(router fiber.Router) {
 	sg.Delete("/delete", h.mdlwrs.Auth.Handle, h.mdlwrs.Auth.HandleIsAdmin, h.Score.DeleteAllScores)
 
 	//Websocket
-	sg.Get("/listen", websocket.New(h.Score.ListenScores))
+	sg.Get("/listen_list", websocket.New(h.Score.ListenScores))
 
 	//Web pages
 	web := router.Group("/leaderboard")

@@ -19,6 +19,7 @@ type Service struct {
 	cfg        *config.Config
 	clnts      *client.Clients
 	scoresColl *mongo.Collection
+	eventList  *EventList
 }
 
 func NewService(cfg *config.Config, clnts *client.Clients) *Service {
@@ -26,6 +27,7 @@ func NewService(cfg *config.Config, clnts *client.Clients) *Service {
 		cfg:        cfg,
 		clnts:      clnts,
 		scoresColl: clnts.Mongo.Collection(constants.ScoresMongoCollection),
+		eventList:  StartEventList(),
 	}
 }
 
@@ -75,8 +77,7 @@ func (s *Service) AddNewScore(ctx context.Context, rating int, nickname string, 
 		return nil, fmt.Errorf("failed to upsert score: %w", err)
 	}
 
-	// Return the updated or inserted score
-	return &Score{
+	score := &Score{
 		ScoreID:  scoreID,
 		Season:   currentSeason,
 		ScoredAt: timeNow.Format(time.RFC3339),
@@ -89,7 +90,12 @@ func (s *Service) AddNewScore(ctx context.Context, rating int, nickname string, 
 			WinLoseRatio: utils.CalculateWinLoseRatio(wins, losses),
 			Region:       region,
 		},
-	}, nil
+	}
+
+	s.eventList.PostScore(score)
+
+	// Return the updated or inserted score
+	return score, nil
 }
 
 type ListScoresParams struct {
@@ -136,4 +142,12 @@ func (s *Service) DeleteAllScores(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (s *Service) SubsribeList(l chan<- *Score) {
+	s.eventList.Subscribe(l)
+}
+
+func (s *Service) UnsubscribeList(l chan<- *Score) {
+	s.eventList.Unsubscribe(l)
 }

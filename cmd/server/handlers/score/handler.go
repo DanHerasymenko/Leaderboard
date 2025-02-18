@@ -171,5 +171,21 @@ func (h *Handler) DeleteAllScores(ctx *fiber.Ctx) error {
 	return ctx.JSON("DeleteAllScores success")
 }
 
+// @Summary ListenScores
+// @Description Listen to the score list updates
+// @Tags Score
+// @Success 200 {string} string "ListenScores success"
+// @Router /api/score/listen_list [get]
 func (h *Handler) ListenScores(conn *websocket.Conn) {
+
+	ch := make(chan *ss.Score)
+	h.svsc.Score.SubsribeList(ch)
+	defer h.svsc.Score.UnsubscribeList(ch)
+
+	for score := range ch {
+		if err := conn.WriteJSON(score); err != nil {
+			return
+		}
+	}
+
 }

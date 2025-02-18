@@ -154,6 +154,23 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/score/listen_list": {
+            "get": {
+                "description": "Listen to the score list updates",
+                "tags": [
+                    "Score"
+                ],
+                "summary": "ListenScores",
+                "responses": {
+                    "200": {
+                        "description": "ListenScores success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/score/submit": {
             "post": {
                 "security": [
