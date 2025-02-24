@@ -56,7 +56,7 @@ func (s *Service) AddNewScore(ctx context.Context, rating int, nickname string, 
 			"season":   currentSeason,
 			"scoredAt": timeNow.Format(time.RFC3339),
 			"scoreDetails": bson.M{
-				"worldRank":    0, // TODO: Implement ranking position
+				"worldRank":    0,
 				"rating":       rating,
 				"nickname":     nickname,
 				"wins":         wins,
@@ -70,7 +70,6 @@ func (s *Service) AddNewScore(ctx context.Context, rating int, nickname string, 
 		},
 	}
 
-	// Perform upsert (update if exists, insert if not)
 	opts := options.Update().SetUpsert(true)
 	_, err = s.scoresColl.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
@@ -94,7 +93,6 @@ func (s *Service) AddNewScore(ctx context.Context, rating int, nickname string, 
 
 	s.eventList.PostScore(score)
 
-	// Return the updated or inserted score
 	return score, nil
 }
 
