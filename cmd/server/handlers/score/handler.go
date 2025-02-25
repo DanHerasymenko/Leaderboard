@@ -171,11 +171,10 @@ func (h *Handler) DeleteAllScores(ctx *fiber.Ctx) error {
 	return ctx.JSON("DeleteAllScores success")
 }
 
-// @Summary ListenScores
-// @Description Listen to the score list updates
+// @Summary WebSocket Connection for Live Scores
+// @Description Connect to this WebSocket to receive live score updates
 // @Tags Score
-// @Success 200 {string} string "ListenScores success"
-// @Router /api/score/listen_list [get]
+// @Router /score/listen [get]
 func (h *Handler) ListenScores(conn *websocket.Conn) {
 
 	ch := make(chan *ss.Score)

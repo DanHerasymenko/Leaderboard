@@ -91,6 +91,11 @@ func (s *Service) AddNewScore(ctx context.Context, rating int, nickname string, 
 		},
 	}
 
+	err = s.updateWorldRanks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update rankings: %w", err)
+	}
+
 	s.eventList.PostScore(score)
 
 	return score, nil
@@ -137,6 +142,29 @@ func (s *Service) DeleteAllScores(ctx context.Context) error {
 	if err != nil {
 		logger.Error(ctx, fmt.Errorf("failed to delete all scores: %w", err))
 		return err
+	}
+
+	return nil
+}
+
+func (s *Service) updateWorldRanks(ctx context.Context) error {
+	// MongoDB Aggregation to Rank Players by Rating
+	pipeline := mongo.Pipeline{
+		{{Key: "$setWindowFields", Value: bson.M{
+			"partitionBy": nil,                               // Global ranking, no partitioning
+			"sortBy":      bson.M{"scoreDetails.rating": -1}, // Descending order
+			"output": bson.M{
+				"scoreDetails.worldRank": bson.M{
+					"$rank": bson.M{},
+				},
+			},
+		}}},
+	}
+
+	// Apply the pipeline to update rankings
+	_, err := s.scoresColl.Aggregate(ctx, pipeline)
+	if err != nil {
+		return fmt.Errorf("failed to update rankings: %w", err)
 	}
 
 	return nil
